@@ -1,118 +1,124 @@
-//
+// KeyPath.swift
 // Stencil
-// Copyright © 2022 Stencil
-// MIT Licence
 //
+// Copyright (c) 2022, Kyle Fuller
+// All rights reserved.
+//
+// Copyright 2024 MFB Technologies, Inc.
+//
+// This source code is licensed under the BSD-2-Clause License found in the
+// LICENSE file in the root directory of this source tree.
 
 import Foundation
 
 /// A structure used to represent a template variable, and to resolve it in a given context.
 final class KeyPath {
-  private var components = [String]()
-  private var current = ""
-  private var partialComponents = [String]()
-  private var subscriptLevel = 0
+    private var components = [String]()
+    private var current = ""
+    private var partialComponents = [String]()
+    private var subscriptLevel = 0
 
-  let variable: String
-  let context: Context
+    let variable: String
+    let context: Context
 
-  // Split the keypath string and resolve references if possible
-  init(_ variable: String, in context: Context) {
-    self.variable = variable
-    self.context = context
-  }
-
-  func parse() throws -> [String] {
-    defer {
-      components = []
-      current = ""
-      partialComponents = []
-      subscriptLevel = 0
+    // Split the keypath string and resolve references if possible
+    init(_ variable: String, in context: Context) {
+        self.variable = variable
+        self.context = context
     }
 
-    for character in variable {
-      switch character {
-      case "." where subscriptLevel == 0:
-        try foundSeparator()
-      case "[":
-        try openBracket()
-      case "]":
-        try closeBracket()
-      default:
-        try addCharacter(character)
-      }
-    }
-    try finish()
+    func parse() throws -> [String] {
+        defer {
+            components = []
+            current = ""
+            partialComponents = []
+            subscriptLevel = 0
+        }
 
-    return components
-  }
+        for character in variable {
+            switch character {
+            case "." where subscriptLevel == 0:
+                try foundSeparator()
+            case "[":
+                try openBracket()
+            case "]":
+                try closeBracket()
+            default:
+                try addCharacter(character)
+            }
+        }
+        try finish()
 
-  private func foundSeparator() throws {
-    if !current.isEmpty {
-      partialComponents.append(current)
-    }
-
-    guard !partialComponents.isEmpty else {
-      throw TemplateSyntaxError("Unexpected '.' in variable '\(variable)'")
-    }
-
-    components += partialComponents
-    current = ""
-    partialComponents = []
-  }
-
-  // when opening the first bracket, we must have a partial component
-  private func openBracket() throws {
-    guard !partialComponents.isEmpty || !current.isEmpty else {
-      throw TemplateSyntaxError("Unexpected '[' in variable '\(variable)'")
+        return components
     }
 
-    if subscriptLevel > 0 {
-      current.append("[")
-    } else if !current.isEmpty {
-      partialComponents.append(current)
-      current = ""
+    private func foundSeparator() throws {
+        if !current.isEmpty {
+            partialComponents.append(current)
+        }
+
+        guard !partialComponents.isEmpty else {
+            throw TemplateSyntaxError("Unexpected '.' in variable '\(variable)'")
+        }
+
+        components += partialComponents
+        current = ""
+        partialComponents = []
     }
 
-    subscriptLevel += 1
-  }
+    // when opening the first bracket, we must have a partial component
+    private func openBracket() throws {
+        guard !partialComponents.isEmpty || !current.isEmpty else {
+            throw TemplateSyntaxError("Unexpected '[' in variable '\(variable)'")
+        }
 
-  // for a closing bracket at root level, try to resolve the reference
-  private func closeBracket() throws {
-    guard subscriptLevel > 0 else {
-      throw TemplateSyntaxError("Unbalanced ']' in variable '\(variable)'")
+        if subscriptLevel > 0 {
+            current.append("[")
+        } else if !current.isEmpty {
+            partialComponents.append(current)
+            current = ""
+        }
+
+        subscriptLevel += 1
     }
 
-    if subscriptLevel > 1 {
-      current.append("]")
-    } else if !current.isEmpty,
-      let value = try Variable(current).resolve(context) {
-      partialComponents.append("\(value)")
-      current = ""
-    } else {
-      throw TemplateSyntaxError("Unable to resolve subscript '\(current)' in variable '\(variable)'")
+    // for a closing bracket at root level, try to resolve the reference
+    private func closeBracket() throws {
+        guard subscriptLevel > 0 else {
+            throw TemplateSyntaxError("Unbalanced ']' in variable '\(variable)'")
+        }
+
+        if subscriptLevel > 1 {
+            current.append("]")
+        } else if !current.isEmpty,
+                  let value = try Variable(current).resolve(context)
+        {
+            partialComponents.append("\(value)")
+            current = ""
+        } else {
+            throw TemplateSyntaxError("Unable to resolve subscript '\(current)' in variable '\(variable)'")
+        }
+
+        subscriptLevel -= 1
     }
 
-    subscriptLevel -= 1
-  }
+    private func addCharacter(_ character: Character) throws {
+        guard partialComponents.isEmpty || subscriptLevel > 0 else {
+            throw TemplateSyntaxError("Unexpected character '\(character)' in variable '\(variable)'")
+        }
 
-  private func addCharacter(_ character: Character) throws {
-    guard partialComponents.isEmpty || subscriptLevel > 0 else {
-      throw TemplateSyntaxError("Unexpected character '\(character)' in variable '\(variable)'")
+        current.append(character)
     }
 
-    current.append(character)
-  }
+    private func finish() throws {
+        // check if we have a last piece
+        if !current.isEmpty {
+            partialComponents.append(current)
+        }
+        components += partialComponents
 
-  private func finish() throws {
-    // check if we have a last piece
-    if !current.isEmpty {
-      partialComponents.append(current)
+        guard subscriptLevel == 0 else {
+            throw TemplateSyntaxError("Unbalanced subscript brackets in variable '\(variable)'")
+        }
     }
-    components += partialComponents
-
-    guard subscriptLevel == 0 else {
-      throw TemplateSyntaxError("Unbalanced subscript brackets in variable '\(variable)'")
-    }
-  }
 }

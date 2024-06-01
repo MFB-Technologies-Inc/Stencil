@@ -1,0 +1,8 @@
+--extensionacl on-declarations
+--redundanttype explicit
+--swiftversion 5.10
+--maxwidth 120
+--header "{file}\nStencil\n\nCopyright (c) 2022, Kyle Fuller\nAll rights reserved.\n\nCopyright 2024 MFB Technologies, Inc.\n\nThis source code is licensed under the BSD-2-Clause License found in the\nLICENSE file in the root directory of this source tree.""
+--allman false
+--wraparguments before-first
+--wrapcollections before-first

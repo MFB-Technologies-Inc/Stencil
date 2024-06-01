@@ -1,25 +1,15 @@
 {
-  "object": {
-    "pins": [
-      {
-        "package": "PathKit",
-        "repositoryURL": "https://github.com/kylef/PathKit.git",
-        "state": {
-          "branch": null,
-          "revision": "3bfd2737b700b9a36565a8c94f4ad2b050a5e574",
-          "version": "1.0.1"
-        }
-      },
-      {
-        "package": "Spectre",
-        "repositoryURL": "https://github.com/kylef/Spectre.git",
-        "state": {
-          "branch": null,
-          "revision": "26cc5e9ae0947092c7139ef7ba612e34646086c7",
-          "version": "0.10.1"
-        }
+  "originHash" : "50fbde08d602f864b135774cb988c5f750a02d0183edeb69f753c228811062ca",
+  "pins" : [
+    {
+      "identity" : "pathkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/MFB-Technologies-Inc/PathKit.git",
+      "state" : {
+        "revision" : "fec0f80a3c613551a440d708a4959ecb9d935476",
+        "version" : "1.0.2"
       }
-    ]
-  },
-  "version": 1
+    }
+  ],
+  "version" : 3
 }

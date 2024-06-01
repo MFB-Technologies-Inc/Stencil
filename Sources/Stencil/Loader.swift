@@ -20,7 +20,7 @@ public protocol Loader {
     func loadTemplate(names: [String], environment: Environment) throws -> Template
 }
 
-extension Loader {
+extension Loader where Self: Sendable {
     /// Default implementation, tries to load the first template that exists from the list of given names
     public func loadTemplate(names: [String], environment: Environment) throws -> Template {
         for name in names {
@@ -38,7 +38,7 @@ extension Loader {
 }
 
 // A class for loading a template from disk
-public final class FileSystemLoader: Loader, CustomStringConvertible {
+public final class FileSystemLoader: Loader, CustomStringConvertible, Sendable {
     public let paths: [Path]
 
     public init(paths: [Path]) {
@@ -90,7 +90,7 @@ public final class FileSystemLoader: Loader, CustomStringConvertible {
     }
 }
 
-public class DictionaryLoader: Loader {
+public final class DictionaryLoader: Loader, Sendable {
     public let templates: [String: String]
 
     public init(templates: [String: String]) {

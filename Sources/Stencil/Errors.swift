@@ -11,9 +11,9 @@
 
 public final class TemplateDoesNotExist: Error, CustomStringConvertible {
     let templateNames: [String]
-    let loader: Loader?
+    let loader: (any Loader & Sendable)?
 
-    public init(templateNames: [String], loader: Loader? = nil) {
+    public init(templateNames: [String], loader: (any Loader & Sendable)? = nil) {
         self.templateNames = templateNames
         self.loader = loader
     }

@@ -140,10 +140,10 @@ struct Lexer {
     ///            the line.
     func rangeLocation(_ range: Range<String.Index>) -> ContentLocation {
         guard let line = lines.first(where: { $0.range.contains(range.lowerBound) }) else {
-            return ("", 0, 0)
+            return ContentLocation(content: "", lineNumber: 0, lineOffset: 0)
         }
         let offset = templateString.distance(from: line.range.lowerBound, to: range.lowerBound)
-        return (line.content, line.number, offset)
+        return ContentLocation(content: line.content, lineNumber: line.number, lineOffset: offset)
     }
 }
 
@@ -264,7 +264,16 @@ extension String {
     }
 }
 
-// swiftlint:disable large_tuple
 /// Location in some content (text)
-public typealias ContentLocation = (content: String, lineNumber: UInt, lineOffset: Int)
-// swiftlint:enable large_tuple
+public struct ContentLocation: Hashable, Sendable {
+    public var content: String
+    public var lineNumber: UInt
+    public var lineOffset: Int
+
+    @inlinable
+    public init(content: String, lineNumber: UInt, lineOffset: Int) {
+        self.content = content
+        self.lineNumber = lineNumber
+        self.lineOffset = lineOffset
+    }
+}

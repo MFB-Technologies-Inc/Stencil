@@ -79,11 +79,14 @@ extension String {
     }
 }
 
-public struct SourceMap: Equatable {
+public struct SourceMap: Equatable, Sendable {
     public let filename: String?
     public let location: ContentLocation
 
-    init(filename: String? = nil, location: ContentLocation = ("", 0, 0)) {
+    init(
+        filename: String? = nil,
+        location: ContentLocation = ContentLocation(content: "", lineNumber: 0, lineOffset: 0)
+    ) {
         self.filename = filename
         self.location = location
     }
@@ -108,8 +111,8 @@ public struct WhitespaceBehaviour: Equatable, Sendable {
     public static let unspecified = WhitespaceBehaviour(leading: .unspecified, trailing: .unspecified)
 }
 
-public final class Token: Equatable {
-    public enum Kind: Equatable {
+public final class Token: Equatable, Sendable {
+    public enum Kind: Equatable, Sendable {
         /// A token representing a piece of text.
         case text
         /// A token representing a variable.
@@ -123,10 +126,12 @@ public final class Token: Equatable {
     public let contents: String
     public let kind: Kind
     public let sourceMap: SourceMap
-    public var whitespace: WhitespaceBehaviour?
+    public let whitespace: WhitespaceBehaviour?
 
     /// Returns the underlying value as an array seperated by spaces
-    public private(set) lazy var components: [String] = self.contents.smartSplit()
+    public func components() -> [String] {
+        contents.smartSplit()
+    }
 
     init(contents: String, kind: Kind, sourceMap: SourceMap, whitespace: WhitespaceBehaviour? = nil) {
         self.contents = contents

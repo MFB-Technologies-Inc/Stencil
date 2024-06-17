@@ -13,7 +13,7 @@
 /// Useful for example for scanning until a given "end"-node.
 public func until(_ tags: [String]) -> ((TokenParser, Token) -> Bool) {
     { _, token in
-        if let name = token.components.first {
+        if let name = token.components().first {
             for tag in tags where name == tag {
                 return true
             }
@@ -65,11 +65,12 @@ public class TokenParser {
                     return nodes
                 }
 
-                if var tag = token.components.first {
+                let components = token.components()
+                if var tag = components.first {
                     do {
                         // special case for labeled tags (such as for loops)
-                        if tag.hasSuffix(":"), token.components.count >= 2 {
-                            tag = token.components[1]
+                        if tag.hasSuffix(":"), components.count >= 2 {
+                            tag = components[1]
                         }
 
                         let parser = try environment.findTag(name: tag)

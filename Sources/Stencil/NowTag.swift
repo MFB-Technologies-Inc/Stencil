@@ -19,7 +19,7 @@
         class func parse(_: TokenParser, token: Token) throws -> NodeType {
             var format: Variable?
 
-            let components = token.components
+            let components = token.components()
             guard components.count <= 2 else {
                 throw TemplateSyntaxError("'now' tags may only have one argument: the format string.")
             }

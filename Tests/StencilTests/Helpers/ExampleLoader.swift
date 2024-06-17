@@ -11,7 +11,7 @@
 
 import Stencil
 
-class ExampleLoader: Loader {
+final class ExampleLoader: Loader, Sendable {
     func loadTemplate(name: String, environment: Environment) throws -> Template {
         if name == "example.html" {
             return Template(templateString: "Hello World!", environment: environment, name: name)

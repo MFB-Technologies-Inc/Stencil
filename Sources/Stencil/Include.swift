@@ -17,7 +17,7 @@ class IncludeNode: NodeType {
     let token: Token?
 
     class func parse(_: TokenParser, token: Token) throws -> NodeType {
-        let bits = token.components
+        let bits = token.components()
 
         guard bits.count == 2 || bits.count == 3 else {
             throw TemplateSyntaxError(

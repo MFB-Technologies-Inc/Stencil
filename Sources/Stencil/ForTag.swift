@@ -21,7 +21,7 @@ class ForNode: NodeType {
     let token: Token?
 
     class func parse(_ parser: TokenParser, token: Token) throws -> NodeType {
-        var components = token.components
+        var components = token.components()
 
         var label: String?
         if components.first?.hasSuffix(":") == true {
@@ -237,7 +237,7 @@ struct LoopTerminationNode: NodeType {
     }
 
     static func parse(_ parser: TokenParser, token: Token) throws -> LoopTerminationNode {
-        let components = token.components
+        let components = token.components()
 
         guard components.count <= 2 else {
             throw TemplateSyntaxError("'\(token.contents)' can accept only one parameter")
@@ -281,8 +281,9 @@ extension TokenParser {
     fileprivate func hasOpenedForTag() -> Bool {
         var openForCount = 0
         for parsedToken in parsedTokens.reversed() where parsedToken.kind == .block {
-            if parsedToken.components.first == "endfor" { openForCount -= 1 }
-            if parsedToken.components.first == "for" { openForCount += 1 }
+            let components = parsedToken.components()
+            if components.first == "endfor" { openForCount -= 1 }
+            if components.first == "for" { openForCount += 1 }
         }
         return openForCount > 0
     }

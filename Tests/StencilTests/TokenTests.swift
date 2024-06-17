@@ -16,7 +16,7 @@ final class TokenTests: XCTestCase {
     func testToken() throws {
         _ = {
             let token = Token.text(value: "hello world", at: .unknown)
-            let components = token.components
+            let components = token.components()
 
             XCTAssertEqual(
                 components.count,
@@ -37,7 +37,7 @@ final class TokenTests: XCTestCase {
 
         _ = {
             let token = Token.text(value: "hello 'kyle fuller'", at: .unknown)
-            let components = token.components
+            let components = token.components()
 
             XCTAssertEqual(
                 components.count,
@@ -58,7 +58,7 @@ final class TokenTests: XCTestCase {
 
         _ = {
             let token = Token.text(value: "hello \"kyle fuller\"", at: .unknown)
-            let components = token.components
+            let components = token.components()
 
             XCTAssertEqual(
                 components.count,
